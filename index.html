@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Para Ti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #080510;
+            --rose: #ff2d55;
+            --rose-soft: #ff6b9d;
+            --rose-deep: #c2185b;
+            --pink: #ffb6c1;
+            --gold: #ffd700;
+            --violet: #7b2ff7;
+        }
+
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: #fff;
+            cursor: default;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ===== AURORA ===== */
+        .aurora {
+            position: fixed; inset: 0;
+            z-index: 0; pointer-events: none;
+            overflow: hidden;
+        }
+        .aurora span {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.12;
+            animation: drift 18s ease-in-out infinite alternate;
+        }
+        .aurora span:nth-child(1) { width: 600px; height: 600px; background: var(--rose); top: -30%; left: -10%; }
+        .aurora span:nth-child(2) { width: 500px; height: 500px; background: var(--violet); bottom: -30%; right: -15%; animation-delay: -6s; animation-duration: 22s; }
+        .aurora span:nth-child(3) { width: 400px; height: 400px; background: var(--rose-deep); top: 50%; left: 60%; animation-delay: -12s; animation-duration: 25s; }
+        .aurora span:nth-child(4) { width: 350px; height: 350px; background: var(--gold); top: 30%; left: 20%; opacity: 0.06; animation-delay: -4s; }
+
+        @keyframes drift {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(60px, -40px) scale(1.15); }
+            100% { transform: translate(-40px, 60px) scale(0.9); }
+        }
+
+        /* ===== SPARKLE CURSOR ===== */
+        .spark {
+            position: fixed; pointer-events: none; z-index: 9999;
+            border-radius: 50%;
+            animation: sparkDie .7s ease-out forwards;
+        }
+        @keyframes sparkDie {
+            0%   { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0) rotate(180deg); opacity: 0; }
+        }
+
+        /* ===== SHOCKWAVE ===== */
+        .shockwave {
+            position: fixed; z-index: 5; pointer-events: none;
+            border: 2px solid rgba(255, 45, 85, 0.6);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            animation: shockExpand 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes shockExpand {
+            0%   { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        /* ===== CONTENIDO CENTRAL ===== */
+        .stage {
+            position: fixed; inset: 0;
+            z-index: 10;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            pointer-events: none;
+        }
+
+        .stage > * { pointer-events: auto; }
+
+        /* ===== CORAZON PRINCIPAL ===== */
+        .heart-wrap {
+            position: relative;
+            cursor: pointer;
+            transition: transform 1s cubic-bezier(.4,0,.2,1);
+        }
+
+        .heart-wrap.small {
+            transform: scale(0.5) translateY(-40px);
+        }
+
+        .heart-glow {
+            position: absolute; top: 50%; left: 50%;
+            width: 260px; height: 260px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255,45,85,0.35), transparent 70%);
+            border-radius: 50%;
+            animation: glow 2.5s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: .5; }
+            50%      { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+        }
+
+        .heart-svg {
+            width: 140px; height: 140px;
+            filter: drop-shadow(0 0 30px var(--rose)) drop-shadow(0 0 60px rgba(255,45,85,.4));
+            animation: float 3s ease-in-out infinite;
+            position: relative; z-index: 2;
+            transition: filter .5s ease;
+        }
+
+        .heart-svg:hover {
+            filter: drop-shadow(0 0 40px var(--rose)) drop-shadow(0 0 80px rgba(255,45,85,.6));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50%      { transform: translateY(-12px) scale(1.04); }
+        }
+
+        .heart-svg path {
+            fill: url(#heartGrad);
+        }
+
+        /* click beat */
+        .heart-svg.beat {
+            animation: beatHard .5s ease;
+        }
+        @keyframes beatHard {
+            0%   { transform: scale(1); }
+            20%  { transform: scale(1.35); }
+            40%  { transform: scale(0.95); }
+            60%  { transform: scale(1.2); }
+            80%  { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+
+        /* ===== HINT ===== */
+        .hint {
+            margin-top: 25px;
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,.65);
+            text-transform: uppercase;
+            animation: fadeInUp 1.5s ease .5s both;
+            transition: opacity .8s ease;
+        }
+        .hint.hide { opacity: 0; pointer-events: none; visibility: hidden; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TEXTOS ===== */
+        .text-layer {
+            position: absolute;
+            text-align: center;
+            width: 90%;
+            max-width: 700px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1.2s ease, transform 1.2s cubic-bezier(.4,0,.2,1);
+            pointer-events: none;
+        }
+        .text-layer.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Phase 1 */
+        .phase1 { top: 52%; }
+        .phase1 .title {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(3rem, 9vw, 6.5rem);
+            background: linear-gradient(135deg, #fff 0%, var(--pink) 50%, var(--gold) 100%);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            filter: drop-shadow(0 0 30px rgba(255,45,85,.35));
+            line-height: 1.1;
+        }
+        .phase1 .sub {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(.95rem, 2.5vw, 1.35rem);
+            color: var(--pink);
+            margin-top: 12px;
+            font-style: italic;
+            letter-spacing: 2px;
+        }
+
+        /* Phase 2 */
+        .phase2 { top: 52%; }
+        .phase2 .msg {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(1.1rem, 3vw, 1.7rem);
+            line-height: 1.9;
+            color: rgba(255,255,255,.88);
+            font-style: italic;
+        }
+        .phase2 .msg span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: wordIn .6s ease forwards;
+        }
+
+        @keyframes wordIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Phase 3 */
+        .phase3 { top: 8%; }
+        .phase3 .teamo {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(4rem, 14vw, 10rem);
+            background: linear-gradient(135deg, var(--rose-soft), var(--gold), var(--rose), var(--violet));
+            background-size: 300% 300%;
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradMove 4s ease infinite;
+            filter: drop-shadow(0 0 40px rgba(255,45,85,.4));
+            line-height: 1;
+        }
+        @keyframes gradMove {
+            0%, 100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
+        }
+        .phase3 .forever {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: rgba(255,255,255,.8);
+            margin-top: 15px;
+            font-style: italic;
+        }
+        .phase3 .inf {
+            font-size: 3rem;
+            color: var(--gold);
+            display: inline-block;
+            margin-top: 20px;
+            animation: spinSlow 10s linear infinite;
+            filter: drop-shadow(0 0 15px rgba(255,215,0,.4));
+        }
+        @keyframes spinSlow { to { transform: rotate(360deg); } }
+
+        /* ===== CLICK RIPPLE ON SCREEN ===== */
+        .ripple-ring {
+            position: fixed; z-index: 4; pointer-events: none;
+            border-radius: 50%;
+            border: 1px solid rgba(255,107,157,0.4);
+            animation: rippleOut .8s ease-out forwards;
+        }
+        @keyframes rippleOut {
+            0%   { width: 0; height: 0; opacity: .8; }
+            100% { width: 300px; height: 300px; opacity: 0; }
+        }
+
+        /* ===== HEART RAIN (Phase 3) ===== */
+        .rain-heart {
+            position: fixed;
+            z-index: 3;
+            pointer-events: none;
+            animation: rainFall linear forwards;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+        @keyframes rainFall {
+            0%   { transform: translateY(-20px) rotate(0deg) scale(1); opacity: .8; }
+            100% { transform: translateY(110vh) rotate(360deg) scale(0.5); opacity: 0; }
+        }
+
+        /* ===== MUSIC BTN ===== */
+        .music-btn {
+            position: fixed; bottom: 20px; right: 20px;
+            width: 46px; height: 46px; border-radius: 50%;
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.1);
+            backdrop-filter: blur(15px);
+            color: #fff; font-size: 1.2rem;
+            cursor: pointer; z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            transition: all .3s ease;
+        }
+        .music-btn:hover { background: rgba(255,45,85,.2); border-color: var(--rose); transform: scale(1.1); }
+        .music-btn.on { box-shadow: 0 0 20px rgba(255,45,85,.5); }
+
+        /* ===== JARDIN LUMINOSO ===== */
+        .garden-wrap {
+            position: fixed;
+            bottom: -5px; left: 50%;
+            transform: translateX(-50%);
+            width: 90vw; max-width: 850px;
+            height: 80vh;
+            z-index: 8;
+            pointer-events: none;
+            clip-path: inset(100% 0 0 0);
+        }
+        .garden-wrap.grow {
+            animation: gardenReveal 4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes gardenReveal {
+            0%   { clip-path: inset(100% 0 0 0); }
+            100% { clip-path: inset(0% 0 0 0); }
+        }
+
+        .garden-svg {
+            width: 100%; height: 100%;
+            filter: drop-shadow(0 0 6px rgba(255,100,160,0.5));
+            overflow: visible;
+        }
+
+        /* Sway para tallos y pasto */
+        .sway-slow {
+            transform-origin: bottom center;
+            animation: swaySlow 5s ease-in-out infinite;
+        }
+        .sway-med {
+            transform-origin: bottom center;
+            animation: swayMed 4s ease-in-out infinite;
+        }
+        .sway-fast {
+            transform-origin: bottom center;
+            animation: swayFast 3.5s ease-in-out infinite;
+        }
+        @keyframes swaySlow {
+            0%, 100% { transform: rotate(0deg); }
+            50%      { transform: rotate(2deg); }
+        }
+        @keyframes swayMed {
+            0%, 100% { transform: rotate(0.5deg); }
+            50%      { transform: rotate(-2deg); }
+        }
+        @keyframes swayFast {
+            0%, 100% { transform: rotate(-1deg); }
+            50%      { transform: rotate(2.5deg); }
+        }
+
+        /* Glow dots */
+        .glow-dot {
+            position: fixed; z-index: 7; pointer-events: none;
+            border-radius: 50%;
+            animation: dotFloat 3.5s ease-in-out infinite alternate;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        .glow-dot.on { opacity: 1; }
+        @keyframes dotFloat {
+            0%   { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-25px) scale(1.4); }
+        }
+
+        /* Petalos cayendo */
+        .petal {
+            position: fixed; z-index: 7; pointer-events: none;
+            animation: petalFall linear forwards;
+        }
+        @keyframes petalFall {
+            0%   { opacity: 0.8; transform: translateY(0) rotate(0deg) translateX(0); }
+            25%  { transform: translateY(25vh) rotate(80deg) translateX(25px); }
+            50%  { transform: translateY(50vh) rotate(170deg) translateX(-20px); }
+            75%  { transform: translateY(75vh) rotate(260deg) translateX(20px); }
+            100% { opacity: 0; transform: translateY(105vh) rotate(360deg) translateX(-10px); }
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Aurora BG -->
+<div class="aurora"><span></span><span></span><span></span><span></span></div>
+
+<!-- Particles -->
+<canvas id="c"></canvas>
+
+<!-- Stage -->
+<div class="stage" id="stage">
+
+    <div class="heart-wrap" id="heartWrap">
+        <div class="heart-glow"></div>
+        <svg class="heart-svg" id="heartSvg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ff6b9d"/>
+                    <stop offset="50%" stop-color="#ff2d55"/>
+                    <stop offset="100%" stop-color="#c2185b"/>
+                </linearGradient>
+            </defs>
+            <path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/>
+        </svg>
+    </div>
+
+    <p class="hint" id="hint">Toca mi coraz&oacute;n</p>
+
+    <!-- Phase 1: Titulo -->
+    <div class="text-layer phase1" id="phase1">
+        <div class="title">Para Ti, Mi Amor</div>
+        <div class="sub">Cada latido lleva tu nombre</div>
+    </div>
+
+    <!-- Phase 2: Mensaje -->
+    <div class="text-layer phase2" id="phase2">
+        <div class="msg" id="msgText"></div>
+    </div>
+
+    <!-- Phase 3: Te Amo -->
+    <div class="text-layer phase3" id="phase3">
+        <div class="teamo">Te Amo</div>
+        <div class="forever">Hoy, ma&ntilde;ana y por siempre</div>
+        <div class="inf">&infin;</div>
+    </div>
+</div>
+
+<!-- Music -->
+<button class="music-btn" id="musicBtn" title="M&uacute;sica">&#9835;</button>
+
+<script>
+/* ============================================
+   CONFIG - Personaliza aqui
+   ============================================ */
+const LOVE_MESSAGE = "Desde que llegaste a mi vida, todo tiene m\u00e1s color, m\u00e1s sentido, m\u00e1s magia. Eres lo m\u00e1s bonito que me ha pasado. Gracias por ser t\u00fa, por cada sonrisa, por cada momento. Mi coraz\u00f3n es tuyo, hoy y siempre.";
+
+/* ============================================
+   STATE
+   ============================================ */
+let phase = 0; // 0=initial, 1=title, 2=message, 3=teamo
+
+/* ============================================
+   CANVAS - Floating hearts & stars
+   ============================================ */
+const cv = document.getElementById('c');
+const cx = cv.getContext('2d');
+let W, H;
+const parts = [];
+
+function resize() {
+    W = cv.width  = innerWidth;
+    H = cv.height = innerHeight;
+}
+resize();
+addEventListener('resize', resize);
+
+class P {
+    constructor(burst) {
+        this.burst = !!burst;
+        this.init(burst);
+    }
+    init(burst) {
+        if (burst) {
+            this.x = W / 2;
+            this.y = H / 2;
+            const a = Math.random() * Math.PI * 2;
+            const v = Math.random() * 6 + 2;
+            this.vx = Math.cos(a) * v;
+            this.vy = Math.sin(a) * v;
+            this.life = 1;
+            this.decay = Math.random() * 0.015 + 0.008;
+            this.size = Math.random() * 10 + 5;
+            this.type = Math.random() > 0.4 ? 'heart' : 'star';
+        } else {
+            this.x = Math.random() * W;
+            this.y = H + 20 + Math.random() * 40;
+            this.vx = (Math.random() - 0.5) * 0.4;
+            this.vy = -(Math.random() * 0.9 + 0.2);
+            this.life = 1;
+            this.decay = 0;
+            this.size = Math.random() * 10 + 4;
+            this.type = Math.random() > 0.35 ? 'heart' : 'star';
+        }
+        this.rot = Math.random() * 6.28;
+        this.rotV = (Math.random() - 0.5) * 0.03;
+        this.wobble = Math.random() * 6.28;
+        this.hue = this.type === 'heart' ? (Math.random() > 0.5 ? 340 : 350) : 45;
+    }
+    update() {
+        if (this.burst) {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += 0.04;
+            this.vx *= 0.99;
+            this.life -= this.decay;
+            if (this.life <= 0) return false;
+        } else {
+            this.wobble += 0.015;
+            this.x += this.vx + Math.sin(this.wobble) * 0.3;
+            this.y += this.vy;
+            this.rot += this.rotV;
+            if (this.y < -20) {
+                this.x = Math.random() * W;
+                this.y = H + 20;
+            }
+        }
+        return true;
+    }
+    draw() {
+        cx.save();
+        cx.translate(this.x, this.y);
+        cx.rotate(this.rot);
+        cx.globalAlpha = this.burst ? this.life : (Math.random() * 0.2 + 0.25);
+        if (this.type === 'heart') {
+            const s = this.size;
+            cx.fillStyle = `hsl(${this.hue},90%,65%)`;
+            cx.beginPath();
+            cx.moveTo(0, s * 0.3);
+            cx.bezierCurveTo(-s*.5, -s*.3, -s, s*.1, 0, s);
+            cx.bezierCurveTo(s, s*.1, s*.5, -s*.3, 0, s*.3);
+            cx.fill();
+        } else {
+            const s = this.size * 0.45;
+            cx.fillStyle = `hsl(45,100%,75%)`;
+            cx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                cx[i ? 'lineTo' : 'moveTo'](Math.cos(a)*s, Math.sin(a)*s);
+            }
+            cx.closePath();
+            cx.fill();
+        }
+        cx.restore();
+    }
+}
+
+const N = Math.min(45, Math.floor(W / 28));
+for (let i = 0; i < N; i++) {
+    const p = new P(false);
+    p.y = Math.random() * H;
+    parts.push(p);
+}
+
+function loop() {
+    cx.clearRect(0, 0, W, H);
+    for (let i = parts.length - 1; i >= 0; i--) {
+        if (!parts[i].update()) { parts.splice(i, 1); continue; }
+        parts[i].draw();
+    }
+    requestAnimationFrame(loop);
+}
+loop();
+
+/* ============================================
+   CURSOR SPARKLE
+   ============================================ */
+let sparkN = 0;
+document.addEventListener('mousemove', e => {
+    if (++sparkN % 3) return;
+    const d = document.createElement('div');
+    d.className = 'spark';
+    const s = Math.random() * 6 + 3;
+    const c = ['#ff2d55','#ff6b9d','#ffd700','#ffb6c1','#fff','#7b2ff7'];
+    d.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX+(Math.random()-.5)*20}px;top:${e.clientY+(Math.random()-.5)*20}px;background:${c[Math.random()*c.length|0]};box-shadow:0 0 ${s*2}px ${d.style.background}`;
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 700);
+});
+
+/* ============================================
+   SHOCKWAVE
+   ============================================ */
+function shockwave(x, y, size, color) {
+    const el = document.createElement('div');
+    el.className = 'shockwave';
+    el.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size}px;border-color:${color || 'rgba(255,45,85,0.5)'}`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+}
+
+/* ============================================
+   BURST PARTICLES
+   ============================================ */
+function burst(count) {
+    for (let i = 0; i < count; i++) parts.push(new P(true));
+}
+
+/* ============================================
+   FIREWORKS
+   ============================================ */
+function firework(x, y, count) {
+    const colors = ['#ff2d55','#ffd700','#ff6b9d','#7b2ff7','#ffb6c1','#fff'];
+    for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'spark';
+        const s = Math.random() * 6 + 3;
+        const a = (Math.PI * 2 * i) / count;
+        const dist = Math.random() * 120 + 60;
+        const col = colors[Math.random() * colors.length | 0];
+        el.style.cssText = `width:${s}px;height:${s}px;left:${x}px;top:${y}px;background:${col};box-shadow:0 0 ${s*3}px ${col};animation:none`;
+        document.body.appendChild(el);
+        el.animate([
+            { transform: 'scale(1) translate(0,0)', opacity: 1 },
+            { transform: `scale(0) translate(${Math.cos(a)*dist}px,${Math.sin(a)*dist}px)`, opacity: 0 }
+        ], { duration: 900 + Math.random() * 500, easing: 'cubic-bezier(0,.9,.57,1)', fill: 'forwards' })
+        .onfinish = () => el.remove();
+    }
+}
+
+function multiFireworks() {
+    const spots = 8;
+    for (let i = 0; i < spots; i++) {
+        setTimeout(() => {
+            firework(
+                Math.random() * W * 0.8 + W * 0.1,
+                Math.random() * H * 0.6 + H * 0.1,
+                20
+            );
+        }, i * 200);
+    }
+}
+
+/* ============================================
+   HEART RAIN (Phase 3)
+   ============================================ */
+let rainInterval;
+function startHeartRain() {
+    rainInterval = setInterval(() => {
+        const h = document.createElement('div');
+        h.className = 'rain-heart';
+        h.textContent = Math.random() > 0.3 ? '\u2764' : '\u2665';
+        const sz = Math.random() * 1.5 + 0.6;
+        const x = Math.random() * 100;
+        const dur = Math.random() * 3 + 3;
+        h.style.cssText = `left:${x}%;top:-30px;font-size:${sz}rem;color:hsl(${340+Math.random()*20},85%,${60+Math.random()*15}%);animation-duration:${dur}s;opacity:${Math.random()*.5+.3}`;
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), dur * 1000);
+    }, 150);
+}
+
+/* ============================================
+   JARDIN LUMINOSO
+   ============================================ */
+function spawnGarden() {
+    const wrap = document.createElement('div');
+    wrap.className = 'garden-wrap';
+    wrap.innerHTML = `
+    <svg class="garden-svg" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="stmG" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stop-color="#6b1035"/>
+          <stop offset="50%" stop-color="#d44080"/>
+          <stop offset="100%" stop-color="#ff80b0"/>
+        </linearGradient>
+        <linearGradient id="leafG" x1="0" y1="1" x2="0.5" y2="0">
+          <stop offset="0%" stop-color="#8b1a4a"/>
+          <stop offset="100%" stop-color="#e06090"/>
+        </linearGradient>
+        <linearGradient id="petalG" x1="0.5" y1="1" x2="0.5" y2="0">
+          <stop offset="0%" stop-color="rgba(255,160,190,0.7)"/>
+          <stop offset="100%" stop-color="rgba(255,230,240,0.95)"/>
+        </linearGradient>
+        <linearGradient id="grassG" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stop-color="#4a0a25"/>
+          <stop offset="60%" stop-color="#8b1a4a"/>
+          <stop offset="100%" stop-color="#c03060"/>
+        </linearGradient>
+        <radialGradient id="flGlow" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="rgba(255,180,210,0.5)"/>
+          <stop offset="100%" stop-color="rgba(255,180,210,0)"/>
+        </radialGradient>
+        <filter id="neon">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="softG">
+          <feGaussianBlur stdDeviation="8"/>
+        </filter>
+      </defs>
+
+      <!-- ======= PASTO IZQUIERDO (hojas naturales) ======= -->
+
+      <!-- L1: hojita corta cerca del centro -->
+      <g class="sway-fast" style="animation-delay:-0.4s">
+        <path d="M362,598 C358,578 350,554 336,530 C334,527 338,525 340,528 C353,550 362,575 367,598Z" fill="url(#grassG)" opacity="0.4"/>
+      </g>
+      <!-- L2: hoja mediana -->
+      <g class="sway-med" style="animation-delay:-1.8s">
+        <path d="M356,598 C348,565 326,520 296,478 C293,474 297,472 300,476 C329,517 352,562 362,598Z" fill="url(#grassG)" opacity="0.55"/>
+      </g>
+      <!-- L3: hoja mediana con brillo neon -->
+      <g class="sway-slow" style="animation-delay:-0.6s">
+        <path d="M350,598 C340,552 302,484 252,422 C249,418 253,416 256,420 C304,480 344,548 357,598Z" fill="url(#grassG)" opacity="0.65" filter="url(#neon)"/>
+        <circle cx="254" cy="421" r="2.5" fill="#ffb0d0" opacity="0.5" filter="url(#softG)"/>
+      </g>
+      <!-- L4: hoja alta elegante -->
+      <g class="sway-slow" style="animation-delay:-2.2s">
+        <path d="M344,598 C330,536 270,450 190,368 C187,364 191,362 194,366 C272,445 334,533 352,598Z" fill="url(#grassG)" opacity="0.6"/>
+        <circle cx="192" cy="367" r="2.5" fill="#ff80b0" opacity="0.5" filter="url(#softG)"/>
+      </g>
+      <!-- L5: la mas alta y larga -->
+      <g class="sway-med" style="animation-delay:-1s">
+        <path d="M340,598 C324,528 242,425 130,332 C127,329 131,327 134,330 C244,420 328,524 348,598Z" fill="url(#grassG)" opacity="0.5" filter="url(#neon)"/>
+        <circle cx="132" cy="331" r="3" fill="#ffd700" opacity="0.4" filter="url(#softG)"/>
+      </g>
+      <!-- L6: mediana con curva S -->
+      <g class="sway-fast" style="animation-delay:-2.8s">
+        <path d="M352,598 C346,560 318,508 280,458 C265,438 248,418 235,403 C232,400 236,398 239,401 C252,415 270,436 285,456 C322,505 350,556 359,598Z" fill="url(#grassG)" opacity="0.5"/>
+      </g>
+      <!-- L7: zarcillo decorativo con rizo en la punta -->
+      <g class="sway-fast" style="animation-delay:-1.5s">
+        <path d="M358,598 C352,572 336,535 312,500 C300,482 288,466 280,455 C276,449 273,442 276,437 C279,433 282,439 280,447" stroke="url(#grassG)" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.4"/>
+        <circle cx="278" cy="442" r="2" fill="#ffd700" opacity="0.45" filter="url(#softG)"/>
+      </g>
+      <!-- L8: brizna delicada -->
+      <g class="sway-med" style="animation-delay:-3.5s">
+        <path d="M365,598 C361,580 354,560 344,542 C342,538 346,536 348,540 C357,556 364,576 369,598Z" fill="url(#grassG)" opacity="0.35"/>
+      </g>
+
+      <!-- ======= PASTO DERECHO (espejo) ======= -->
+
+      <!-- R1: hojita corta -->
+      <g class="sway-fast" style="animation-delay:-0.7s">
+        <path d="M438,598 C442,578 450,554 464,530 C466,527 462,525 460,528 C447,550 438,575 433,598Z" fill="url(#grassG)" opacity="0.4"/>
+      </g>
+      <!-- R2: hoja mediana -->
+      <g class="sway-med" style="animation-delay:-2.1s">
+        <path d="M444,598 C452,565 474,520 504,478 C507,474 503,472 500,476 C471,517 448,562 438,598Z" fill="url(#grassG)" opacity="0.55"/>
+      </g>
+      <!-- R3: mediana con brillo neon -->
+      <g class="sway-slow" style="animation-delay:-1s">
+        <path d="M450,598 C460,552 498,484 548,422 C551,418 547,416 544,420 C496,480 456,548 443,598Z" fill="url(#grassG)" opacity="0.65" filter="url(#neon)"/>
+        <circle cx="546" cy="421" r="2.5" fill="#ffb0d0" opacity="0.5" filter="url(#softG)"/>
+      </g>
+      <!-- R4: alta elegante -->
+      <g class="sway-slow" style="animation-delay:-2.6s">
+        <path d="M456,598 C470,536 530,450 610,368 C613,364 609,362 606,366 C528,445 466,533 448,598Z" fill="url(#grassG)" opacity="0.6"/>
+        <circle cx="608" cy="367" r="2.5" fill="#ff80b0" opacity="0.5" filter="url(#softG)"/>
+      </g>
+      <!-- R5: la mas alta y larga -->
+      <g class="sway-med" style="animation-delay:-1.4s">
+        <path d="M460,598 C476,528 558,425 670,332 C673,329 669,327 666,330 C556,420 472,524 452,598Z" fill="url(#grassG)" opacity="0.5" filter="url(#neon)"/>
+        <circle cx="668" cy="331" r="3" fill="#ffd700" opacity="0.4" filter="url(#softG)"/>
+      </g>
+      <!-- R6: mediana con curva S -->
+      <g class="sway-fast" style="animation-delay:-3.1s">
+        <path d="M448,598 C454,560 482,508 520,458 C535,438 552,418 565,403 C568,400 564,398 561,401 C548,415 530,436 515,456 C478,505 450,556 441,598Z" fill="url(#grassG)" opacity="0.5"/>
+      </g>
+      <!-- R7: zarcillo con rizo -->
+      <g class="sway-fast" style="animation-delay:-1.9s">
+        <path d="M442,598 C448,572 464,535 488,500 C500,482 512,466 520,455 C524,449 527,442 524,437 C521,433 518,439 520,447" stroke="url(#grassG)" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.4"/>
+        <circle cx="522" cy="442" r="2" fill="#ffd700" opacity="0.45" filter="url(#softG)"/>
+      </g>
+      <!-- R8: brizna delicada -->
+      <g class="sway-med" style="animation-delay:-3.8s">
+        <path d="M435,598 C439,580 446,560 456,542 C458,538 454,536 452,540 C443,556 436,576 431,598Z" fill="url(#grassG)" opacity="0.35"/>
+      </g>
+
+      <!-- ======= TALLOS PRINCIPALES ======= -->
+
+      <!-- Tallo izquierdo -->
+      <g class="sway-slow" style="animation-delay:-0.5s">
+        <path d="M370,600 Q355,480 340,380 Q328,300 320,230" stroke="url(#stmG)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M368,590 Q353,470 338,375 Q327,298 319,230" stroke="rgba(255,180,210,0.15)" stroke-width="2" fill="none"/>
+        <!-- Hojas -->
+        <path d="M345,420 Q310,395 298,378 Q306,372 318,380 Q338,398 348,416Z" fill="url(#leafG)" opacity="0.7"/>
+        <path d="M338,350 Q365,325 378,310 Q372,322 358,338 Q348,348 340,352Z" fill="url(#leafG)" opacity="0.65"/>
+        <path d="M332,300 Q305,280 295,268 Q302,262 312,272 Q328,288 334,298Z" fill="url(#leafG)" opacity="0.6"/>
+        <!-- Glow flor -->
+        <ellipse cx="318" cy="210" rx="40" ry="35" fill="url(#flGlow)" filter="url(#softG)"/>
+        <!-- Flor -->
+        <g filter="url(#neon)">
+          <ellipse cx="305" cy="215" rx="18" ry="28" fill="url(#petalG)" transform="rotate(-20,305,215)" opacity="0.6"/>
+          <ellipse cx="332" cy="215" rx="18" ry="28" fill="url(#petalG)" transform="rotate(20,332,215)" opacity="0.6"/>
+          <ellipse cx="310" cy="210" rx="16" ry="30" fill="url(#petalG)" transform="rotate(-8,310,210)" opacity="0.75"/>
+          <ellipse cx="328" cy="210" rx="16" ry="30" fill="url(#petalG)" transform="rotate(8,328,210)" opacity="0.75"/>
+          <ellipse cx="318" cy="208" rx="14" ry="32" fill="url(#petalG)" opacity="0.9"/>
+          <ellipse cx="318" cy="200" rx="6" ry="5" fill="rgba(255,255,255,0.5)"/>
+        </g>
+      </g>
+
+      <!-- Tallo central (mas alto) -->
+      <g class="sway-slow" style="animation-delay:-1.5s">
+        <path d="M400,600 Q398,460 400,340 Q402,240 400,160" stroke="url(#stmG)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M398,590 Q396,455 398,338 Q400,238 398,162" stroke="rgba(255,180,210,0.15)" stroke-width="2" fill="none"/>
+        <!-- Hojas -->
+        <path d="M398,480 Q360,450 345,432 Q355,425 368,438 Q388,458 398,475Z" fill="url(#leafG)" opacity="0.75"/>
+        <path d="M402,420 Q438,395 452,380 Q446,392 432,405 Q415,418 403,422Z" fill="url(#leafG)" opacity="0.7"/>
+        <path d="M398,360 Q365,335 352,320 Q360,314 372,326 Q390,345 399,358Z" fill="url(#leafG)" opacity="0.65"/>
+        <path d="M402,300 Q432,280 445,268 Q440,280 425,292 Q412,300 403,302Z" fill="url(#leafG)" opacity="0.6"/>
+        <path d="M399,250 Q372,232 362,220 Q370,216 380,225 Q394,240 400,248Z" fill="url(#leafG)" opacity="0.55"/>
+        <!-- Glow flor -->
+        <ellipse cx="400" cy="140" rx="45" ry="40" fill="url(#flGlow)" filter="url(#softG)"/>
+        <!-- Flor -->
+        <g filter="url(#neon)">
+          <ellipse cx="384" cy="148" rx="20" ry="32" fill="url(#petalG)" transform="rotate(-22,384,148)" opacity="0.55"/>
+          <ellipse cx="416" cy="148" rx="20" ry="32" fill="url(#petalG)" transform="rotate(22,416,148)" opacity="0.55"/>
+          <ellipse cx="388" cy="142" rx="18" ry="34" fill="url(#petalG)" transform="rotate(-10,388,142)" opacity="0.7"/>
+          <ellipse cx="412" cy="142" rx="18" ry="34" fill="url(#petalG)" transform="rotate(10,412,142)" opacity="0.7"/>
+          <ellipse cx="400" cy="140" rx="16" ry="36" fill="url(#petalG)" opacity="0.9"/>
+          <ellipse cx="400" cy="130" rx="7" ry="5.5" fill="rgba(255,255,255,0.55)"/>
+        </g>
+      </g>
+
+      <!-- Tallo derecho -->
+      <g class="sway-slow" style="animation-delay:-2.5s">
+        <path d="M430,600 Q445,480 460,380 Q472,300 480,230" stroke="url(#stmG)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M432,590 Q447,470 462,375 Q473,298 481,230" stroke="rgba(255,180,210,0.15)" stroke-width="2" fill="none"/>
+        <!-- Hojas -->
+        <path d="M455,420 Q488,395 500,378 Q494,385 480,398 Q462,414 454,420Z" fill="url(#leafG)" opacity="0.7"/>
+        <path d="M462,350 Q435,325 422,310 Q430,318 445,332 Q458,346 462,352Z" fill="url(#leafG)" opacity="0.65"/>
+        <path d="M470,300 Q498,280 508,265 Q502,276 490,288 Q478,298 472,302Z" fill="url(#leafG)" opacity="0.6"/>
+        <!-- Glow flor -->
+        <ellipse cx="482" cy="210" rx="40" ry="35" fill="url(#flGlow)" filter="url(#softG)"/>
+        <!-- Flor -->
+        <g filter="url(#neon)">
+          <ellipse cx="468" cy="215" rx="18" ry="28" fill="url(#petalG)" transform="rotate(-20,468,215)" opacity="0.6"/>
+          <ellipse cx="496" cy="215" rx="18" ry="28" fill="url(#petalG)" transform="rotate(20,496,215)" opacity="0.6"/>
+          <ellipse cx="474" cy="210" rx="16" ry="30" fill="url(#petalG)" transform="rotate(-8,474,210)" opacity="0.75"/>
+          <ellipse cx="492" cy="210" rx="16" ry="30" fill="url(#petalG)" transform="rotate(8,492,210)" opacity="0.75"/>
+          <ellipse cx="482" cy="208" rx="14" ry="32" fill="url(#petalG)" opacity="0.9"/>
+          <ellipse cx="482" cy="200" rx="6" ry="5" fill="rgba(255,255,255,0.5)"/>
+        </g>
+      </g>
+
+    </svg>`;
+
+    document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('grow'));
+
+    // Glow dots (luciernagas)
+    setTimeout(spawnGlowDots, 1500);
+}
+
+function spawnGlowDots() {
+    const colors = ['#ffb0d0','#ffd700','#ff80b0','#fff','#ffc0d8','#ff6090'];
+    for (let i = 0; i < 22; i++) {
+        const d = document.createElement('div');
+        d.className = 'glow-dot';
+        const s = Math.random() * 5 + 2.5;
+        const col = colors[Math.random() * colors.length | 0];
+        const x = 12 + Math.random() * 76;
+        const y = 15 + Math.random() * 60;
+        d.style.cssText = `width:${s}px;height:${s}px;left:${x}%;bottom:${y}%;background:${col};box-shadow:0 0 ${s*3}px ${col};animation-delay:${Math.random()*4}s;animation-duration:${2.5+Math.random()*3}s;`;
+        document.body.appendChild(d);
+        setTimeout(() => d.classList.add('on'), 800 + Math.random() * 2500);
+    }
+}
+
+function createPetalSVG() {
+    const h = 335 + Math.random() * 25;
+    const l = 60 + Math.random() * 20;
+    return `<svg viewBox="0 0 18 24" width="14" height="20" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9,0 Q16,7 14,14 Q12,21 9,24 Q6,21 4,14 Q2,7 9,0Z" fill="hsl(${h},80%,${l}%)" opacity="0.75"/>
+    </svg>`;
+}
+
+let petalInterval;
+function startPetalRain() {
+    petalInterval = setInterval(() => {
+        const el = document.createElement('div');
+        el.className = 'petal';
+        el.innerHTML = createPetalSVG();
+        const x = Math.random() * 100;
+        const dur = Math.random() * 4 + 5;
+        el.style.cssText = `left:${x}%;top:-25px;animation-duration:${dur}s;opacity:${Math.random()*0.35+0.4}`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), dur * 1000);
+    }, 400);
+}
+
+/* ============================================
+   WORD-BY-WORD ANIMATION
+   ============================================ */
+function animateWords(el, text) {
+    el.innerHTML = '';
+    const words = text.split(' ');
+    words.forEach((w, i) => {
+        const span = document.createElement('span');
+        span.textContent = w + '\u00A0';
+        span.style.animationDelay = `${i * 0.08}s`;
+        el.appendChild(span);
+    });
+}
+
+/* ============================================
+   PHASE TRANSITIONS
+   ============================================ */
+const heartWrap = document.getElementById('heartWrap');
+const heartSvg = document.getElementById('heartSvg');
+const hint = document.getElementById('hint');
+const phase1El = document.getElementById('phase1');
+const phase2El = document.getElementById('phase2');
+const phase3El = document.getElementById('phase3');
+const msgText = document.getElementById('msgText');
+
+function clickHeart() {
+    // Beat animation
+    heartSvg.classList.remove('beat');
+    void heartSvg.offsetWidth;
+    heartSvg.classList.add('beat');
+
+    // Ripple at center
+    const cx = W / 2, cy = H / 2;
+
+    if (phase === 0) {
+        // -> Phase 1: Title reveal
+        phase = 1;
+        hint.classList.add('hide');
+
+        shockwave(cx, cy, 600, 'rgba(255,45,85,0.5)');
+        setTimeout(() => shockwave(cx, cy, 900, 'rgba(255,107,157,0.3)'), 150);
+        burst(60);
+
+        setTimeout(() => {
+            heartWrap.classList.add('small');
+        }, 300);
+
+        setTimeout(() => {
+            phase1El.classList.add('show');
+        }, 600);
+
+    } else if (phase === 1) {
+        // -> Phase 2: Love message
+        phase = 2;
+
+        shockwave(cx, cy, 500, 'rgba(255,215,0,0.4)');
+        burst(40);
+
+        // Fireworks laterales
+        setTimeout(() => firework(W * 0.2, H * 0.3, 18), 100);
+        setTimeout(() => firework(W * 0.8, H * 0.4, 18), 300);
+
+        phase1El.classList.remove('show');
+
+        setTimeout(() => {
+            animateWords(msgText, LOVE_MESSAGE);
+            phase2El.classList.add('show');
+        }, 700);
+
+    } else if (phase === 2) {
+        // -> Phase 3: TE AMO (final)
+        phase = 3;
+
+        shockwave(cx, cy, 1000, 'rgba(255,45,85,0.6)');
+        setTimeout(() => shockwave(cx, cy, 1400, 'rgba(123,47,247,0.3)'), 200);
+        burst(100);
+
+        multiFireworks();
+
+        phase2El.classList.remove('show');
+        heartWrap.style.transition = 'opacity 1s ease';
+        heartWrap.style.opacity = '0';
+
+        setTimeout(() => {
+            phase3El.classList.add('show');
+            startHeartRain();
+            spawnGarden();
+            startPetalRain();
+        }, 800);
+
+    } else {
+        // Phase 3 ya activa: mas fireworks en cada click
+        firework(
+            Math.random() * W * 0.6 + W * 0.2,
+            Math.random() * H * 0.5 + H * 0.1,
+            25
+        );
+        burst(30);
+        shockwave(cx, cy, 500 + Math.random() * 300, `hsla(${340+Math.random()*40},80%,60%,0.4)`);
+    }
+}
+
+heartWrap.addEventListener('click', clickHeart);
+heartWrap.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); clickHeart(); }
+});
+
+// En phase 3, click en cualquier parte = fireworks
+document.addEventListener('click', e => {
+    if (phase >= 3 && !e.target.closest('.music-btn') && !e.target.closest('.heart-wrap')) {
+        firework(e.clientX, e.clientY, 22);
+
+        const r = document.createElement('div');
+        r.className = 'ripple-ring';
+        r.style.cssText = `left:${e.clientX - 150}px;top:${e.clientY - 150}px`;
+        document.body.appendChild(r);
+        setTimeout(() => r.remove(), 800);
+    }
+});
+
+/* ============================================
+   MUSIC - Romantic melody (Web Audio API)
+   ============================================ */
+const musicBtn = document.getElementById('musicBtn');
+let actx, playing = false, musicLoop;
+
+const NOTE = {
+    C3:130.81,D3:146.83,E3:164.81,F3:174.61,G3:196,A3:220,B3:246.94,
+    C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392,A4:440,B4:493.88,
+    C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880
+};
+
+function initMusic() {
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Master volume
+    const master = actx.createGain();
+    master.gain.value = 0.4;
+    master.connect(actx.destination);
+
+    // Delay echo for dreamy feel
+    const delay = actx.createDelay();
+    delay.delayTime.value = 0.38;
+    const fb = actx.createGain(); fb.gain.value = 0.22;
+    const dGain = actx.createGain(); dGain.gain.value = 0.18;
+    delay.connect(fb); fb.connect(delay);
+    delay.connect(dGain); dGain.connect(master);
+
+    // Music box bell note
+    function bell(freq, time, dur, vol = 0.12) {
+        const o1 = actx.createOscillator();
+        const o2 = actx.createOscillator();
+        const g1 = actx.createGain();
+        const g2 = actx.createGain();
+        o1.type = 'sine'; o1.frequency.value = freq;
+        o2.type = 'sine'; o2.frequency.value = freq * 2.99;
+        g1.gain.setValueAtTime(vol, time);
+        g1.gain.exponentialRampToValueAtTime(vol * 0.35, time + dur * 0.4);
+        g1.gain.exponentialRampToValueAtTime(0.001, time + dur);
+        g2.gain.setValueAtTime(vol * 0.055, time);
+        g2.gain.exponentialRampToValueAtTime(0.001, time + dur * 0.35);
+        o1.connect(g1); g1.connect(master); g1.connect(delay);
+        o2.connect(g2); g2.connect(master);
+        o1.start(time); o1.stop(time + dur + 0.05);
+        o2.start(time); o2.stop(time + dur + 0.05);
+    }
+
+    // Soft pad chord
+    function pad(freqs, time, dur, vol = 0.025) {
+        freqs.forEach(f => {
+            const o = actx.createOscillator();
+            const g = actx.createGain();
+            o.type = 'sine'; o.frequency.value = f;
+            g.gain.setValueAtTime(0, time);
+            g.gain.linearRampToValueAtTime(vol, time + 0.9);
+            g.gain.setValueAtTime(vol, time + dur - 0.9);
+            g.gain.linearRampToValueAtTime(0, time + dur);
+            o.connect(g); g.connect(master);
+            o.start(time); o.stop(time + dur + 0.1);
+        });
+    }
+
+    const N = NOTE;
+    const bpm = 70;
+    const bt = 60 / bpm;
+
+    // Two melody variations that alternate
+    const melodyA = [
+        // C: gentle ascending arc
+        [N.E5,0,1.8],[N.G5,1,0.9],[N.A5,1.8,0.9],[N.G5,2.6,1.5],
+        // Am: descending sigh
+        [N.E5,4.2,1.5],[N.D5,5.5,0.9],[N.C5,6.3,0.9],[N.A4,7.2,1.6],
+        // F: hopeful rise
+        [N.C5,8.8,1.2],[N.D5,9.8,0.8],[N.F5,10.5,1.2],[N.E5,11.6,1.5],
+        // G: floating resolve
+        [N.D5,13.2,1.5],[N.E5,14.2,0.8],[N.G5,14.9,1],[N.F5,15.8,0.9],[N.D5,16.6,1.8]
+    ];
+    const melodyB = [
+        // C: higher arc
+        [N.G5,0,1.2],[N.A5,1,0.8],[N.G5,1.7,0.8],[N.E5,2.5,1.6],
+        // Am: emotional descent
+        [N.C5,4.2,1.2],[N.E5,5.2,0.8],[N.D5,5.9,0.8],[N.C5,6.7,0.8],[N.A4,7.5,1.5],
+        // F: tender
+        [N.A4,9,1],[N.C5,9.8,0.8],[N.F5,10.5,1.5],[N.E5,11.8,1.3],
+        // G: gentle close
+        [N.G5,13.2,1],[N.F5,14,0.8],[N.E5,14.7,1],[N.D5,15.6,1.2],[N.C5,16.6,2]
+    ];
+
+    // Pads for each chord
+    const pads = [
+        { notes: [N.C3, N.E3, N.G3], start: 0 },
+        { notes: [N.A3, N.C4, N.E4], start: 4.2 },
+        { notes: [N.F3, N.A3, N.C4], start: 8.8 },
+        { notes: [N.G3, N.B3, N.D4], start: 13.2 }
+    ];
+
+    let loopCount = 0;
+
+    function scheduleLoop() {
+        if (!playing) return;
+        const t0 = actx.currentTime + 0.15;
+        const cycleBt = bt;
+
+        // Choose melody variation
+        const mel = (loopCount % 2 === 0) ? melodyA : melodyB;
+        loopCount++;
+
+        // Schedule pads
+        pads.forEach((p, i) => {
+            const start = t0 + p.start * cycleBt;
+            const nextStart = i < 3 ? t0 + pads[i+1].start * cycleBt : t0 + 18.5 * cycleBt;
+            pad(p.notes, start, nextStart - start + 0.3);
+        });
+
+        // Schedule melody
+        mel.forEach(([freq, beat, dur]) => {
+            bell(freq, t0 + beat * cycleBt, dur * cycleBt, 0.11);
+        });
+
+        // High sparkle notes (very soft, occasional)
+        if (loopCount % 2 === 0) {
+            bell(N.C5 * 2, t0 + 3 * cycleBt, 2 * cycleBt, 0.025);
+            bell(N.E5 * 2, t0 + 11 * cycleBt, 2 * cycleBt, 0.02);
+        }
+
+        const loopDur = 18.5 * cycleBt * 1000;
+        musicLoop = setTimeout(scheduleLoop, loopDur - 150);
+    }
+
+    scheduleLoop();
+}
+
+function stopMusic() {
+    playing = false;
+    clearTimeout(musicLoop);
+    if (actx) { actx.close().catch(()=>{}); actx = null; }
+}
+
+musicBtn.addEventListener('click', () => {
+    if (playing) {
+        stopMusic();
+        musicBtn.classList.remove('on');
+        musicBtn.innerHTML = '&#9835;';
+    } else {
+        playing = true;
+        initMusic();
+        musicBtn.classList.add('on');
+        musicBtn.innerHTML = '&#9836;';
+    }
+});
+
+</script>
+</body>
+</html>
